@@ -1,0 +1,249 @@
+{%- liquid 
+assign products_to_display = section.settings.collection.all_products_count
+
+  if products_to_display > 4
+    assign more_in_collection = true
+  endif
+  -%}
+<div id="slideshow">
+ <div class="wrapper">
+            <div class="collection__title title-wrapper title-wrapper--no-top-margin page-width{% if show_mobile_slider %} title-wrapper--self-padded-tablet-down{% endif %}{% if show_desktop_slider %} collection__title--desktop-slider{% endif %}">
+        {%- if section.settings.title != blank -%}
+          <h2 class="title {{ section.settings.heading_size }}">{{ section.settings.title | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.description != blank or section.settings.show_description and section.settings.collection.description != empty -%}
+          <div class="collection__description {{ section.settings.description_style }}">{%- if section.settings.show_description -%}{{ section.settings.collection.description }}{%- else -%}{{ section.settings.description }}{% endif %}</div>
+        {%- endif -%}
+      </div>
+ <div class="rslides_container">
+ <ul class="rslides responsive-sss" id="slider1">
+ {% for product in collections[section.settings.collection].products %}
+ <li class="slideshow-item">
+    {%- if section.settings.show_labels -%}
+   {% for tag in product.tags %}
+ {% if tag == "label-new" %}
+   <div class="label-new">NEW</div>
+   {%elsif tag == "label-sale"%}
+   <div class="label-new">SALE</div>
+   {%elsif tag == "label-bestseller"%}
+   <div class="label-new">BEST SELLER</div>
+ {% endif%}
+{% endfor %}
+   {%endif%}
+ <a class="img-hover-zoom" href="{{ product.url }}"><img src="{{ product.featured_image | img_url: 'medium' | format: 'jpg' }}" alt="{{ block.settings.slide_heading }}"></a> 
+ 
+   <h3>{{ product.title }}</h3>
+ <h4>{{ product.price | money }}</h4>
+  
+ </li>
+
+ {% endfor %} 
+ </ul>
+
+ </div>
+          {%- if section.settings.show_view_all and more_in_collection -%}
+      <div class="center collection__view-all">
+        <a href="{{ section.settings.collection.url }}"
+          class="{% if section.settings.view_all_style == 'link' %}link underlined-link{% elsif section.settings.view_all_style == 'solid' %}button{% else %}button button--secondary{% endif %}"
+          aria-label="{{ 'sections.featured_collection.view_all_label' | t: collection_name: section.settings.collection.title }}"
+        >
+          {{ 'sections.featured_collection.view_all' | t }}
+        </a>
+      </div>
+    {%- endif -%}
+ </div>
+</div>
+    <style>
+      #slideshow .wrapper
+          {
+          max-width:1300px;
+          margin:0px auto;
+          }
+      .slideshow-item img, .slideshow-item h3, .slideshow-item h4
+          {
+          margin:0px auto;
+          }
+      .slick-slide > div {
+            transform: scale(.5);
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
+          }
+      .slick-center > div {
+            transform: scale(1);
+          }
+      .slider__item > img {
+            width: 100%;
+            height: auto;
+          }
+      .slick-prev:before, .slick-next:before {
+           color: #333 !important;
+          }
+      .label-new {
+            background: #333;
+                    color:#fff;
+
+            margin-top: 1em;
+            padding: 0.3em 0.5em;
+            z-index: 2;
+            position: absolute;
+            font-size: 1.875em;
+          }
+      .img-hover-zoom {
+            overflow: hidden; 
+          }
+
+      .img-hover-zoom img {
+            transition: transform .5s ease;
+          }
+
+
+      .img-hover-zoom:hover img, .slideshow-item:hover img {
+            transform: scale(1.3);
+          }
+      a.img-hover-zoom
+      {
+      display:block;
+      }
+    </style>
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+      <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css" integrity="sha512-6lLUdeQ5uheMFbWm3CP271l14RsX1xtx+J5x2yeIDkkiBpeVTNhTqijME7GgRKKi6hCqovwCoBTlRBEC20M8Mg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+	<script>
+      $('.responsive-sss').slick({
+
+          infinite: true,
+          speed: 300,
+          slidesToShow: 4,
+          slidesToScroll: 1,
+          responsive: [
+        {
+          breakpoint: 1024,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1,
+            infinite: true
+
+          }
+        },
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 2,
+            slidesToScroll: 1
+          }
+        },
+        {
+          breakpoint: 480,
+          settings: {
+            slidesToShow: 1,
+            slidesToScroll: 1
+          }
+        }
+      
+      ]
+    });
+  </script>
+
+{% schema %}
+{
+  "name": "t:sections.custom-featured-collection.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Featured collection",
+      "label": "t:sections.custom-featured-collection.settings.title.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "t:sections.all.heading_size.options__1.label"
+        },
+        {
+          "value": "h1",
+          "label": "t:sections.all.heading_size.options__2.label"
+        },
+        {
+          "value": "h0",
+          "label": "t:sections.all.heading_size.options__3.label"
+        }
+      ],
+      "default": "h1",
+      "label": "t:sections.all.heading_size.label"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "t:sections.custom-featured-collection.settings.description.label"
+    },
+    {
+      "type": "select",
+      "id": "description_style",
+      "label": "t:sections.custom-featured-collection.settings.description_style.label",
+      "options": [
+        {
+          "value": "body",
+          "label": "t:sections.custom-featured-collection.settings.description_style.options__1.label"
+        },
+        {
+          "value": "subtitle",
+          "label": "t:sections.custom-featured-collection.settings.description_style.options__2.label"
+        },
+        {
+          "value": "uppercase",
+          "label": "t:sections.custom-featured-collection.settings.description_style.options__3.label"
+        }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:sections.custom-featured-collection.settings.collection.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "default": true,
+      "label": "t:sections.custom-featured-collection.settings.show_view_all.label"
+    },
+    {
+      "type": "select",
+      "id": "view_all_style",
+      "label": "t:sections.custom-featured-collection.settings.view_all_style.label",
+      "options": [
+        {
+          "value": "link",
+          "label": "t:sections.custom-featured-collection.settings.view_all_style.options__1.label"
+        },
+        {
+          "value": "outline",
+          "label": "t:sections.custom-featured-collection.settings.view_all_style.options__2.label"
+        },
+        {
+          "value": "solid",
+          "label": "t:sections.custom-featured-collection.settings.view_all_style.options__3.label"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_labels",
+      "default": true,
+      "label": "t:sections.custom-featured-collection.settings.show_labels.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.custom-featured-collection.presets.name"
+    }
+  ]
+}
+{% endschema %}
+ 
